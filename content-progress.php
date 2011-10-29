@@ -108,7 +108,8 @@ function cp_list_empty_pages( $post_type, $group ) {
 				break;
 			}
 		}
-	return "<h2>Empty pages:</h2> <ul>".$return."</ul>";
+		$group_string = ucfirst($group);
+	return "<h2>$group_string pages:</h2> <ul>".$return."</ul>";
 	}
 }
 
