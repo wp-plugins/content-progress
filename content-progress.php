@@ -37,7 +37,7 @@ function cp_column($cols) {
 
 // Echo the ID for the new column
 function cp_value($column_name, $id) {
-	if ($column_name == 'cp')
+	if ($column_name == 'cp') {
 		$post = get_post($id);
 		$marked = get_post_meta($id,'_cp_incomplete',true);
 		$content = $post->post_content;
@@ -48,6 +48,7 @@ function cp_value($column_name, $id) {
 		} else if ( $marked == 'true' ) {
 			echo "<img src='".plugins_url( 'images/incomplete.png', __FILE__ )."' alt='".__('Manually marked incomplete.','content-progress')."' title='".__('Manually marked incomplete.','content-progress')."' />";
 		}
+	}
 }
 
 function cp_return_value($value, $column_name, $id) {
