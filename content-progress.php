@@ -3,11 +3,11 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.0.0
+Version: 1.1.0
 Author: Joseph Dolson
 Author URI: http://www.joedolson.com/
 */
-/*  Copyright 2008-2011  Joseph C Dolson  (email : wp-to-twitter@joedolson.com)
+/*  Copyright 2008-2011  Joseph C Dolson  (email : plugins@joedolson.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ Author URI: http://www.joedolson.com/
 */
 // Prepend the new column to the columns array
 global $cp_version;
-$cp_version = '1.0.0';
+$cp_version = '1.1.0';
 
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) ) );
 
@@ -47,6 +47,8 @@ function cp_value($column_name, $id) {
 			echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' title='".__('Document has less than 60 characters of content.','content-progress')."' />";	
 		} else if ( $marked == 'true' ) {
 			echo "<img src='".plugins_url( 'images/incomplete.png', __FILE__ )."' alt='".__('Manually marked incomplete.','content-progress')."' title='".__('Manually marked incomplete.','content-progress')."' />";
+		} else if ( $marked == 'complete' ) {
+			echo "<img src='".plugins_url( 'images/complete.png', __FILE__ )."' alt='".__('Manually marked complete.','content-progress')."' title='".__('Manually marked complete.','content-progress')."' />";
 		}
 	}
 }
@@ -92,12 +94,12 @@ function cp_list_empty_pages( $post_type, $group ) {
 		foreach ( $posts as $post ) {
 			switch ($group) {
 				case 'empty':
-				if ( $post->post_content == '' ) {
+				if ( $post->post_content == '' && get_post_meta($post->ID,'_cp_incomplete',true ) != 'complete' ) {
 					$return .= "<li><a href='".esc_url(get_permalink( $post->ID ))."'>$post->post_title</a></li>";
 				}
 				break;
 				case 'incomplete':
-				if ( strlen($post->post_content) < 60 ) {
+				if ( strlen($post->post_content) < 60 && get_post_meta($post->ID,'_cp_incomplete',true ) != 'complete' ) {
 					$return .= "<li><a href='".esc_url(get_permalink( $post->ID ))."'>$post->post_title</a></li>";
 				}				
 				break;
@@ -162,7 +164,7 @@ function cp_plugin_update_message() {
 		$bits=explode('== Upgrade Notice ==',$data);
 		echo '<div id="mc-upgrade"><p><strong style="color:#c22;">Upgrade Notes:</strong> '.nl2br(trim($bits[1])).'</p></div>';
 	} else {
-		printf(__('<br /><strong>Note:</strong> Please review the <a class="thickbox" href="%1$s">changelog</a> before upgrading.','wp-to-twitter'),'plugin-install.php?tab=plugin-information&amp;plugin=content-progress&amp;TB_iframe=true&amp;width=640&amp;height=594');
+		printf(__('<br /><strong>Note:</strong> Please review the <a class="thickbox" href="%1$s">changelog</a> before upgrading.','content-progress'),'plugin-install.php?tab=plugin-information&amp;plugin=content-progress&amp;TB_iframe=true&amp;width=640&amp;height=594');
 	}
 }
 
@@ -176,8 +178,14 @@ function cp_add_outer_box() {
 function cp_add_inner_box() {
 	global $post_id;
 	$cp = get_post_meta($post_id, '_cp_incomplete',true );
-	if ( $cp == 'true' ) { $checked = ' checked="checked"'; } else { $checked = ''; }
-	echo "<input type='checkbox' name='_cp_incomplete' value='true' id='_cp_incomplete'$checked /> <label for='_cp_incomplete'>".__('Mark as incomplete','content-progress')."</label>";
+	if ( $cp == 'true' ) { $tchecked = ' checked="checked"'; } else { $tchecked = ''; }
+	if ( $cp == 'complete' ) { $cchecked = ' checked="checked"'; } else { $cchecked = ''; }
+	if ( $cp == 'default' || !$cp ) { $dchecked = ' checked="checked"'; } else { $dchecked = ''; }
+	echo "<ul>";
+	echo "<li><input type='radio' name='_cp_incomplete' value='true' id='_cp_incomplete'$tchecked /> <label for='_cp_incomplete'>".__('Mark as incomplete','content-progress')."</label></li>";
+	echo "<li><input type='radio' name='_cp_incomplete' value='complete' id='_cp_incomplete'$cchecked /> <label for='_cp_incomplete'>".__('Mark as complete','content-progress')."</label></li>";
+	echo "<li><input type='radio' name='_cp_incomplete' value='default' id='_cp_incomplete'$dchecked /> <label for='_cp_incomplete'>".__('Default','content-progress')."</label></li>";
+	echo "</ul>";
 }
 add_action( 'admin_menu','cp_add_outer_box' );
 
@@ -251,14 +259,14 @@ $plugins_string
 		$from = "From: \"$current_user->display_name\" <$current_user->user_email>\r\n";
 
 		if ( !$has_read_faq ) {
-			echo "<div class='message error'><p>".__('Please read the FAQ and other Help documents before making a support request.','wp-to-twitter')."</p></div>";
+			echo "<div class='message error'><p>".__('Please read the FAQ and other Help documents before making a support request.','content-progress')."</p></div>";
 		} else {
 			wp_mail( "plugins@joedolson.com",$subject,$message,$from );
 		
 			if ( $has_donated == 'Donor' || $has_purchased == 'Purchaser' ) {
-				echo "<div class='message updated'><p>".__('Thank you for supporting the continuing development of this plug-in! I\'ll get back to you as soon as I can.','wp-to-twitter')."</p></div>";		
+				echo "<div class='message updated'><p>".__('Thank you for supporting the continuing development of this plug-in! I\'ll get back to you as soon as I can.','content-progress')."</p></div>";		
 			} else {
-				echo "<div class='message updated'><p>".__('I\'ll get back to you as soon as I can, after dealing with any support requests from plug-in supporters.','wp-to-twitter')."</p></div>";				
+				echo "<div class='message updated'><p>".__('I\'ll get back to you as soon as I can, after dealing with any support requests from plug-in supporters.','content-progress')."</p></div>";				
 			}
 		}
 	}
@@ -279,7 +287,7 @@ $plugins_string
 		<label for='support_request'>Support Request:</label><br /><textarea name='support_request' id='support_request' cols='80' rows='10'>".stripslashes($request)."</textarea>
 		</p>
 		<p>
-		<input type='submit' value='".__('Send Support Request','my-calendar')."' name='mc_support' class='button-primary' />
+		<input type='submit' value='".__('Send Support Request','content-progress')."' name='mc_support' class='button-primary' />
 		</p>
 		<p>".
 		__('The following additional information will be sent with your support request:','content-progress')
@@ -309,22 +317,22 @@ function cp_support_page() {
 function cp_show_support_box() {
 ?>
 <div id="support">
-<div class="resources">
-<ul>
-<li><strong><a href="http://www.joedolson.com/donate.php" rel="external"><?php _e("Make a Donation",'content-progress'); ?></a></strong></li>
-<li><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<div>
-<input type="hidden" name="cmd" value="_s-xclick" />
-<input type="hidden" name="hosted_button_id" value="86NC6DRYKH5DS" />
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" name="submit" alt="Make a gift to support Content Progress!" />
-<img alt="" src="https://www.paypalobjects.com/WEBSCR-640-20110429-1/en_US/i/scr/pixel.gif" width="1" height="1" />
-</form>
-
-</div>
-</form>
-</li>
-</ul>
-</div>
+	<div class="resources">
+	<ul>
+		<li><strong><a href="http://www.joedolson.com/donate.php" rel="external"><?php _e("Make a Donation",'content-progress'); ?></a></strong></li>
+		<li><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+			<div>
+			<input type="hidden" name="cmd" value="_s-xclick" />
+			<input type="hidden" name="hosted_button_id" value="86NC6DRYKH5DS" />
+			<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" name="submit" alt="Make a gift to support Content Progress!" />
+			<img alt="" src="https://www.paypalobjects.com/WEBSCR-640-20110429-1/en_US/i/scr/pixel.gif" width="1" height="1" />
+			</div>
+		</form>
+		</li>
+		<li><a href="http://profiles.wordpress.org/users/joedolson/"><?php _e('Check out my other plug-ins','content-progress'); ?></a></li>
+		<li><a href="http://wordpress.org/extend/plugins/content-progress/"><?php _e('Rate this plug-in','content-progress'); ?></a></li>		
+	</ul>
+	</div>
 </div>
 <?php
 }
@@ -344,9 +352,10 @@ function cp_styles() {
 add_action( 'admin_menu', 'cp_add_support_page' );
 
 function cp_plugin_action($links, $file) {
-	if ($file == plugin_basename(dirname(__FILE__).'/content-progress.php'))
+	if ($file == plugin_basename(dirname(__FILE__).'/content-progress.php')) {
 		$links[] = "<a href='options-general.php?page=content-progress/content-progress.php'>" . __('Get Support', 'content-progress', 'content-progress') . "</a>";
-		$links[] = "<a href='http://www.joedolson.com/donate.php'>" . __('Donate', 'content-progress', 'content-progress') . "</a>";		
+		$links[] = "<a href='http://www.joedolson.com/donate.php'>" . __('Donate', 'content-progress', 'content-progress') . "</a>";
+	}
 	return $links;
 }
 //Add Plugin Actions to WordPress

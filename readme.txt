@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== Content Progress ===
 Contributors: joedolson
 Donate link: http://www.joedolson.com/donate.php
 Tags: page, post, admin, developer, tools, progress, content
@@ -21,6 +21,12 @@ There are also three shortcodes available for generating front-facing lists of p
 Translations are always welcome! The translation file is in the download. Granted, there isn't a lot of text in this plug-in.
 
 == Changelog ==
+
+= 1.1.0 =
+
+* Added option to mark a document as complete, as well as mark as incomplete.
+* Changed flags: Blue flag now means complete, Yellow means short content. 
+* Updated some textdomain labels (had wrong plug-in textdomain on a few strings.
 
 = 1.0.0 =
 
