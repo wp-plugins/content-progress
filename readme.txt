@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate.php
 Tags: page, post, admin, developer, tools, progress, content
 Requires at least: 3.2.1
-Tested up to: 3.3 beta
+Tested up to: 3.3.1
 Stable tag: trunk
 
 Adds a column to each post/page or custom post type indicating whether content has been added to the page.
@@ -16,11 +16,17 @@ You also have the option to flag any document as incomplete, regardless of the c
 
 This simply provides a quick and efficient way to scan over which documents in your web site are finished, since it is frequently the case in my own development that I add all new pages (for the purpose of building menus and navigation) before actually filling those pages with content.
 
-There are also three shortcodes available for generating front-facing lists of pages: [empty], [partial], and [incomplete] which will produce appropriate unordered lists of documents. Each shortcode accepts an argument for the post type: e.g. [empty type='post']
+There are also four shortcodes available for generating front-facing lists of pages: [empty], [partial], [incomplete], and [needs_review] which will produce appropriate unordered lists of documents. Each shortcode accepts an argument for the post type: e.g. [empty type='post']
 
 Translations are always welcome! The translation file is in the download. Granted, there isn't a lot of text in this plug-in.
 
 == Changelog ==
+
+= 1.1.1 =
+
+* Added new option: mark "Needs Review"
+* Replaced all graphics with more intuitive icons.
+* Fixed theme data bug 
 
 = 1.1.0 =
 
@@ -50,4 +56,4 @@ While working on a web site with several hundred pages, it got difficult to keep
 
 == Upgrade Notice ==
 
-* No notes yet!
+* Adds "Needs Review option", new icons. 
