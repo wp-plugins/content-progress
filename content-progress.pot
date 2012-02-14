@@ -1,0 +1,142 @@
+# Copyright (C) 2010 Content Progress
+# This file is distributed under the same license as the Content Progress package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Content Progress 1.1.0\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/content-progress\n"
+"POT-Creation-Date: 2011-11-04 20:54:27+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: content-progress.php:34
+msgid "Flag"
+msgstr ""
+
+#: content-progress.php:45
+msgid "Document is empty"
+msgstr ""
+
+#: content-progress.php:47
+msgid "Document has less than 60 characters of content."
+msgstr ""
+
+#: content-progress.php:49
+msgid "Manually marked incomplete."
+msgstr ""
+
+#: content-progress.php:51
+msgid "Manually marked complete."
+msgstr ""
+
+#: content-progress.php:167
+msgid ""
+"<br /><strong>Note:</strong> Please review the <a class=\"thickbox\" href=\"%"
+"1$s\">changelog</a> before upgrading."
+msgstr ""
+
+#: content-progress.php:185
+msgid "Mark as incomplete"
+msgstr ""
+
+#: content-progress.php:186
+msgid "Mark as complete"
+msgstr ""
+
+#: content-progress.php:187
+msgid "Default"
+msgstr ""
+
+#: content-progress.php:262
+msgid ""
+"Please read the FAQ and other Help documents before making a support request."
+msgstr ""
+
+#: content-progress.php:267
+msgid ""
+"Thank you for supporting the continuing development of this plug-in! I'll "
+"get back to you as soon as I can."
+msgstr ""
+
+#: content-progress.php:269
+msgid ""
+"I'll get back to you as soon as I can, after dealing with any support "
+"requests from plug-in supporters."
+msgstr ""
+
+#: content-progress.php:279
+msgid ""
+"Please note: I do keep records of those who have donated, but if your "
+"donation came from somebody other than your account at this web site, please "
+"note this in your message."
+msgstr ""
+
+#: content-progress.php:281
+msgid ""
+"I have read <a href=\"http://www.joedolson.com/articles/content-progress/"
+"\">the FAQ for this plug-in</a>."
+msgstr ""
+
+#: content-progress.php:284
+msgid ""
+"I have <a href=\"http://www.joedolson.com/donate.php\">made a donation to "
+"help support this plug-in</a>."
+msgstr ""
+
+#: content-progress.php:290
+msgid "Send Support Request"
+msgstr ""
+
+#: content-progress.php:293
+msgid ""
+"The following additional information will be sent with your support request:"
+msgstr ""
+
+#: content-progress.php:306
+msgid "Get Plug-in Support"
+msgstr ""
+
+#: content-progress.php:322
+msgid "Make a Donation"
+msgstr ""
+
+#: content-progress.php:332
+msgid "Check out my other plug-ins"
+msgstr ""
+
+#: content-progress.php:333
+msgid "Rate this plug-in"
+msgstr ""
+
+#: content-progress.php:356
+msgid "Get Support"
+msgstr ""
+
+#: content-progress.php:357
+msgid "Donate"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Content Progress"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "http://www.joedolson.com/articles/content-progress/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Adds a column to each post/page or custom post type indicating whether "
+"content has been added to the page."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Joseph Dolson"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://www.joedolson.com/"
+msgstr ""
