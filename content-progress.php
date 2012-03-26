@@ -83,19 +83,19 @@ function cp_add() {
 	$settings = get_option( 'cp_settings' );
 	add_action('admin_head', 'cp_css');
 	
-	if ( in_array( 'post', $settings ) || !$settings ) {
+	if ( !$settings || in_array( 'post', $settings ) ) {
 		add_filter('manage_posts_columns', 'cp_column');
 		add_action('manage_posts_custom_column', 'cp_value', 10, 2);
 	}
-	if ( in_array( 'page', $settings ) || !$settings ) {
+	if ( !$settings || in_array( 'page', $settings ) ) {
 		add_filter('manage_pages_columns', 'cp_column');
 		add_action('manage_pages_custom_column', 'cp_value', 10, 2);
 	}
 	$post_types = get_post_types( '','names' );
 	foreach ( $post_types as $types ) {
-		if ( in_array( $types, $settings ) || !$settings ) {
+		if ( !$settings || in_array( $types, $settings ) ) {		
 			add_action("manage_${types}_columns", 'cp_column');			
-			add_filter("manage_${types}_custom_column", 'cp_return_value', 10, 3);
+			add_filter("manage_${types}_custom_column", 'cp_return_value', 10, 2);
 		}
 	}
 
