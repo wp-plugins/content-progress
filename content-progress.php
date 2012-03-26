@@ -91,7 +91,8 @@ function cp_add() {
 		add_filter('manage_pages_columns', 'cp_column');
 		add_action('manage_pages_custom_column', 'cp_value', 10, 2);
 	}
-	foreach ( get_post_types() as $types ) {
+	$post_types = get_post_types( '','names' );
+	foreach ( $post_types as $types ) {
 		if ( in_array( $types, $settings ) || !$settings ) {
 			add_action("manage_${types}_columns", 'cp_column');			
 			add_filter("manage_${types}_custom_column", 'cp_return_value', 10, 3);
@@ -175,7 +176,7 @@ add_action('quick_edit_custom_box', 'cp_quickedit_show', 10, 2);
  
 function cp_quickedit_show( $col, $type ) {
 	$settings = get_option( 'cp_settings' );
-	if ( in_array( $type, $settings ) ) {
+	if ( in_array( $type, $settings ) || !$settings ) {
 		if ( $col == 'cp' ) {
 			$label = 'Flag';
 			$name = '_cp_incomplete';
