@@ -24,6 +24,10 @@ Translations are always welcome! The translation file is in the download. Grante
 
 == Changelog ==
 
+= 1.2.2 =
+
+* Oh, wow. I forgot to add the scripts directory to the subversion repository.
+
 = 1.2.1 = 
 
 * Settings bug
