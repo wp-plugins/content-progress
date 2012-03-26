@@ -3,7 +3,7 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.2.0
+Version: 1.2.1
 Author: Joseph Dolson
 Author URI: http://www.joedolson.com/
 */
@@ -25,7 +25,7 @@ Author URI: http://www.joedolson.com/
 */
 // Prepend the new column to the columns array
 global $cp_version;
-$cp_version = '1.2.0';
+$cp_version = '1.2.1';
 
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) ) );
 
@@ -83,16 +83,16 @@ function cp_add() {
 	$settings = get_option( 'cp_settings' );
 	add_action('admin_head', 'cp_css');
 	
-	if ( in_array( 'post', $settings ) ) {
+	if ( in_array( 'post', $settings ) || !$settings ) {
 		add_filter('manage_posts_columns', 'cp_column');
 		add_action('manage_posts_custom_column', 'cp_value', 10, 2);
 	}
-	if ( in_array( 'page', $settings ) ) {
+	if ( in_array( 'page', $settings ) || !$settings ) {
 		add_filter('manage_pages_columns', 'cp_column');
 		add_action('manage_pages_custom_column', 'cp_value', 10, 2);
 	}
 	foreach ( get_post_types() as $types ) {
-		if ( in_array( $types, $settings ) ) {
+		if ( in_array( $types, $settings ) || !$settings ) {
 			add_action("manage_${types}_columns", 'cp_column');			
 			add_filter("manage_${types}_custom_column", 'cp_return_value', 10, 3);
 		}

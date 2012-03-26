@@ -24,6 +24,10 @@ Translations are always welcome! The translation file is in the download. Grante
 
 == Changelog ==
 
+= 1.2.1 = 
+
+* Settings bug
+
 = 1.2.0 =
 
 * Added 'notes' column to posts tables.
