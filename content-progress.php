@@ -3,11 +3,11 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.2.2
+Version: 1.2.3
 Author: Joseph Dolson
 Author URI: http://www.joedolson.com/
 */
-/*  Copyright 2008-2012  Joseph C Dolson  (email : plugins@joedolson.com)
+/*  Copyright 2011-2012  Joseph C Dolson  (email : plugins@joedolson.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ Author URI: http://www.joedolson.com/
 */
 // Prepend the new column to the columns array
 global $cp_version;
-$cp_version = '1.2.2';
+$cp_version = '1.2.3';
 
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) ) );
 
@@ -73,7 +73,8 @@ function cp_css() {
 <style type="text/css">
 #cp { width: 40px; } 
 #cp_notes { width: 120px; }
-.inline-edit-col-left legend { text-transform:uppercase; font-weight: 700; }	
+.inline-edit-col-left legend { text-transform:uppercase; font-weight: 700; }
+.text_input { float: left; width: 50%}
 </style>
 <?php	
 }
@@ -176,7 +177,7 @@ add_action('quick_edit_custom_box', 'cp_quickedit_show', 10, 2);
  
 function cp_quickedit_show( $col, $type ) {
 	$settings = get_option( 'cp_settings' );
-	if ( in_array( $type, $settings ) || !$settings ) {
+	if ( !$settings || in_array( $type, $settings ) ) {
 		if ( $col == 'cp' ) {
 			$label = 'Flag';
 			$name = '_cp_incomplete';
@@ -280,12 +281,20 @@ get_currentuserinfo();
 	$php_version = phpversion();
 
 	// theme data
+	if ( function_exists( 'wp_get_theme' ) ) {
+	$theme = wp_get_theme();
+		$theme_name = $theme->Name;
+		$theme_uri = $theme->ThemeURI;
+		$theme_parent = $theme->Template;
+		$theme_version = $theme->Version;	
+	} else {
 	$theme_path = get_stylesheet_directory().'/style.css';
 	$theme = get_theme_data($theme_path);
 		$theme_name = $theme['Name'];
-		$theme_uri = $theme['URI'];
+		$theme_uri = $theme['ThemeURI'];
 		$theme_parent = $theme['Template'];
 		$theme_version = $theme['Version'];
+	}
 	// plugin data
 	$plugins = get_plugins();
 	$plugins_string = '';

@@ -8,7 +8,7 @@ function quickEditCP() {
         if (typeof(id) == 'object') {
             id = this.getId(id);
         }
-        if (this.type == 'post') {
+        //if (this.type == 'post') {
             var
             // editRow is the quick-edit row, containing the inputs that need to be updated
             editRow = $('#edit-' + id),
@@ -23,7 +23,7 @@ function quickEditCP() {
             // set the values in the quick-editor
             $(':input[name="_cp_notes"]', editRow).val(notes);
             $(':input[name="_cp_incomplete"]', editRow).val(incomplete);
-        }
+        //}
     };
 }
 // Another way of ensuring inlineEditPost.edit isn't patched until it's defined
