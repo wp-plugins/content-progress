@@ -1,30 +1,48 @@
 === Content Progress ===
 Contributors: joedolson
 Donate link: http://www.joedolson.com/donate.php
-Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview
+Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview, workflow
 Requires at least: 3.2.1
-Tested up to: 3.4.1
+Tested up to: 3.5.0
 Stable tag: trunk
 
-Mark your WordPress posts and Pages as completed, partial, needing review. Add notes documenting what needs to be done.
+Manage your work flow: mark WordPress posts and Pages as completed, partial, needing review. Add notes documenting editorial needs.
 
 == Description ==
 
-Content Progress adds icons to your content listings (Posts, Pages, and custom post types) showing whether the document is complete. While the plug-in has no way to know whether the page has been completely laid out, etc., it can tell whether there is actually content on the page. If there isn't, that document will be flagged as empty. If there's only a small quantity of content on the page, that document will be flagged as partial. 
+Content Progress is a plug-in to help manage your content editing work flow. It adds icons to your content listings (Posts, Pages, and custom post types) to indicate the current needs for that post. 
 
 The plug-in auto-detects empty posts or documents with very small amounts of content; but also allows you to flag documents specifically.
 
-You can flag any document as incomplete or needing review, regardless of the content in that page. 
+You can flag any document as incomplete or needing review, or create custom content flags suitable to your needs, such as "Needs Research", "Add Media" or "Needs Scheduling".
 
 To help communication between groups (or remembering where you are for large sites!), you can also add notes to each post.
 
-This simply provides a quick and efficient way to scan over which documents in your web site are finished, since it is frequently the case in my own development that I add all new pages (for the purpose of building menus and navigation) before actually filling those pages with content.
+This simple work flow plug-in provides a quick way to scan over which documents in your web site are finished, since it is frequently the case in my own development that I add all new pages (for the purpose of building menus and navigation) before actually filling those pages with content.
 
 There are also four shortcodes available for generating front-facing lists of pages: [empty], [partial], [incomplete], and [needs_review] which will produce appropriate unordered lists of documents. Each shortcode accepts an argument for the post type: e.g. [empty type='post']
 
+With the addition of custom statuses available in version 1.3.0, a fifth shortcode [list status=''] is available to produce a list of items with a custom status.
+
 Translating my plug-ins is always appreciated. Visit <a href="http://translate.joedolson.com">my translations site</a> to start getting your language into shape!
 
+Languages available (in order of completeness):
+Irish
+
+Translator Credits (in no particular order)*:
+[Ale Gonzalez](http://60rpm.tv/i), [Outshine Solutions](http://outshinesolutions.com), [Jakob Smith](http://www.omkalfatring.dk/), [globus2008](http://wordpress.org/support/profile/globus2008), Frederic Escallier, Luud Heck, Wim Strijbos, [Daisuke Abe](http://www.alter-ego.jp/), [Alex](http://blog.sotvoril.ru/), Mehmet Ko&ccedil;ali, Uwe Jonas, Florian Edelmann, Efva Nyberg, [Sabir Musta](http://mustaphasabir.altervista.org), Massimo Sgobino, Leonardo Kfoury, Alexandre Carvalho, Amir Khalilnejad, [Aurelio De Rosa](http://www.audero.it/), Bayram Dede, Dani Locasati, Dario Nunez, Dirk Ginader, Evren Erten, Fl&aacute;vio Pereira, Francois-Xavier Benard, [Gianni Diurno](http://www.gidibao.net), Giksi, Heinz Ochsner,  Kazuyuki Kumai, Liam Boogar, Maks, Mano, Massimo Sgobino, Mohsen Aghaei, Oscar, [Rashid Niamat](http://niamatmediagroup.nl/), Stefan Wikstrom, Thomas Meyer, Vedar Ozdemir, [Vikas Arora](http://www.wiznicworld.com), [Miriam de Paula](http://wpmidia.com.br), [HostUCan](http://www.hostucan.com), [Alex Alexandrov](http://www.webhostingrating.com), [Alyona Lompar](http://www.webhostinggeeks.com), [David Gil P&eacute;rez](http://www.sohelet.com), [Burkov Boris](http://chernobog.ru), [Raivo Ratsep](http://raivoratsep.com), [Jibo](http://jibo.ro), [Rasmus Himmelstrup](http://seoanalyst.dk), [kndb](http://blog.layer8.sh/)
+
+
+
 == Changelog ==
+
+= 1.3.0 =
+
+* Added ability to create custom status labels.
+* Added icon library
+* Bug fix: posts without set values did not display with default settings.
+* Revised description.
+* Added Irish translation.
 
 = 1.2.3 =
 
@@ -81,4 +99,4 @@ While working on a web site with several hundred pages, it got difficult to keep
 
 == Upgrade Notice ==
 
-* 1.2.3: Minor bug fix to quick edit script; bug fix.
+* 1.3.0: Custom statuses, custom icons, Irish translation.

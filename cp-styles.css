@@ -1,3 +1,4 @@
-#support { background:#fff; padding: 15px; border-radius: 10px; float: right; }
+#content-progress .postbox { margin: 10px 10px 0 0;	}
+#content-progress .meta-box-sortables { min-height: 0; }
 .icon-guide img { vertical-align: bottom; position: relative; top: 5px;}
-.icon-guide li { margin: 0; }
+.icon-guide li { margin: 0 0 5px; }
