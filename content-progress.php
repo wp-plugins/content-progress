@@ -3,7 +3,7 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.3.0
+Version: 1.3.1
 Author: Joseph Dolson
 Author URI: http://www.joedolson.com/
 */
@@ -25,7 +25,7 @@ Author URI: http://www.joedolson.com/
 */
 // Prepend the new column to the columns array
 global $cp_version;
-$cp_version = '1.3.0';
+$cp_version = '1.3.1';
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) . '/lang' ) );
 cp_check_version();
 
@@ -192,13 +192,14 @@ add_action('quick_edit_custom_box', 'cp_quickedit_show', 10, 2);
 function cp_quickedit_show( $col, $type ) {
 	$settings = get_option( 'cp_settings' );
 	$statuses = get_option( 'cp_statuses' );
+	$fieldset = $label = $field = $close_fieldset = '';
 	if ( !$settings || in_array( $type, $settings ) ) {
 		if ( $col == 'cp' ) {
 			$label = 'Flag';
 			$name = '_cp_incomplete';
 			$field = "<select name='$name' id='$name'>";
 					foreach ( $statuses as $key => $value ) {
-						$field .= "<option value='$key'>$value[2]</option>";
+						$field .= "<option value='$key'>$value[label]</option>";
 					}
 			$field .= "
 						<option value='default'>Default</option>
