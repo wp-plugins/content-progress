@@ -34,6 +34,10 @@ Translator Credits (in no particular order)*:
 
 == Changelog ==
 
+= 1.3.2 =
+
+* Bug fix: Added fallback function for exif_imagetype when exif not installed. (Related to: custom status icons)
+
 = 1.3.1 =
 
 * Fixed broken labels when updating flags in Quick Edit.
