@@ -395,7 +395,7 @@ $plugins_string
 		<input type='checkbox' name='has_donated' id='has_donated' value='on' /> <label for='has_donated'>".__('I have <a href="http://www.joedolson.com/donate.php">made a donation to help support this plug-in</a>.','content-progress')."</label>
 		</p>
 		<p>
-		<label for='support_request'>Support Request:</label><br /><textarea name='support_request' id='support_request' cols='80' rows='10'>".stripslashes($request)."</textarea>
+		<label for='support_request'>Support Request:</label><br /><textarea name='support_request' id='support_request' required aria-required='true' cols='80' rows='10'>".stripslashes($request)."</textarea>
 		</p>
 		<p>
 		<input type='submit' value='".__('Send Support Request','content-progress')."' name='cp_support' class='button-primary' />
@@ -614,7 +614,8 @@ function cp_add_support_page() {
 		 $plugin_page = add_options_page( 'Content Progress Support', 'Content Progress', 'manage_options', __FILE__, 'cp_support_page' );
 		 add_action( 'admin_head-'. $plugin_page, 'cp_styles' );
     }
- }
+}
+
 function cp_styles() {
 	if ( $_GET['page'] == "content-progress/content-progress.php" ) {
 		echo '<link type="text/css" rel="stylesheet" href="'.plugins_url('cp-styles.css', __FILE__ ).'" />';
