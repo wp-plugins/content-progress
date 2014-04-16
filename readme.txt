@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate.php
 Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview, workflow
 Requires at least: 3.2.1
-Tested up to: 3.7.0
+Tested up to: 3.9.0
 Stable tag: trunk
 
 Manage your work flow: mark WordPress posts and Pages as completed, partial, needing review. Add notes documenting editorial needs.
