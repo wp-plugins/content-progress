@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate.php
 Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview, workflow
 Requires at least: 3.2.1
-Tested up to: 3.9.0
+Tested up to: 3.9.1
 Stable tag: trunk
 
 Manage your work flow: mark WordPress posts and Pages as completed, partial, needing review. Add notes documenting editorial needs.
@@ -27,11 +27,15 @@ With the addition of custom statuses available in version 1.3.0, a fifth shortco
 Translating my plug-ins is always appreciated. Visit <a href="http://translate.joedolson.com">my translations site</a> to start getting your language into shape!
 
 Languages available (in order of completeness):
-Spanish, French, Dutch, Irish
+Spanish, French, Dutch, German, Irish
 
 <a href="http://www.joedolson.com/articles/translator-credits/">Translator Credits</a>
 
 == Changelog ==
+
+= 1.3.6 =
+
+* Added language: German
 
 = 1.3.5 =
 
@@ -117,4 +121,4 @@ While working on a web site with several hundred pages, it got difficult to keep
 
 == Upgrade Notice ==
 
-* 1.3.0: Custom statuses, custom icons, Irish translation.
+* 1.3.6: German translation
