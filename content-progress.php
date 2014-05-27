@@ -3,11 +3,11 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.3.5
+Version: 1.3.6
 Author: Joseph Dolson
 Author URI: http://www.joedolson.com/
 */
-/*  Copyright 2011-2013  Joseph C Dolson  (email : plugins@joedolson.com)
+/*  Copyright 2011-2014  Joseph C Dolson  (email : plugins@joedolson.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ Author URI: http://www.joedolson.com/
 */
 // Prepend the new column to the columns array
 global $cp_version;
-$cp_version = '1.3.5';
+$cp_version = '1.3.6';
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) . '/lang' ) );
 cp_check_version();
 
