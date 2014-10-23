@@ -3,9 +3,9 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.3.6
+Version: 1.3.7
 Author: Joseph Dolson
-Author URI: http://www.joedolson.com/
+Author URI: https://www.joedolson.com/
 */
 /*  Copyright 2011-2014  Joseph C Dolson  (email : plugins@joedolson.com)
 
@@ -25,7 +25,7 @@ Author URI: http://www.joedolson.com/
 */
 // Prepend the new column to the columns array
 global $cp_version;
-$cp_version = '1.3.6';
+$cp_version = '1.3.7';
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) . '/lang' ) );
 cp_check_version();
 
@@ -73,9 +73,12 @@ function cp_value($column_name, $id) {
 		$marked = ( get_post_meta($id,'_cp_incomplete',true) )?get_post_meta($id,'_cp_incomplete',true):'default';
 		$content = $post->post_content;
 		$statuses = get_option( 'cp_statuses' );
+		$incomplete_length = apply_filters( 'cp_incomplete_length', 60, $id );
 		if ( $content == '' && $marked=='default' ) {
+			update_post_meta( $id, '_cp_incomplete', 'empty' );
 			echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked' title='".__('Document is empty','content-progress')."' />";
-		} else if ( strlen($content) < 60 && $marked=='default' ) {
+		} else if ( strlen($content) < $incomplete_length && $marked=='default' ) {
+			update_post_meta( $id, '_cp_incomplete', 'partial' );		
 			echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' class='$marked' title='".__('Document has less than 60 characters of content.','content-progress')."' />";	
 		} else {
 			foreach ( $statuses as $key => $value ) {
@@ -133,66 +136,72 @@ function cp_add() {
 	}
 
 }
-
 add_action('admin_init', 'cp_add');
 
 function cp_list_empty_pages( $post_type, $group ) {
 	$return = '';
 	if ( is_user_logged_in() ) {
-	$posts = get_posts( array( 'post_type'=>$post_type,'numberposts'=>-1,'orderby'=>'title', 'meta_key'=>'_cp_incomplete', 'meta_value'=>$group ) ); 
+		$args = array( 
+			'post_type'=>$post_type,
+			'posts_per_page'=> -1,
+			'orderby'=>'title', 
+			'meta_key'=>'_cp_incomplete', 
+			'meta_value'=>$group 
+		);
+		$posts = get_posts( $args ); 
 		foreach ( $posts as $post ) {
 			$return .= "<li><a href='".esc_url(get_permalink( $post->ID ))."'>$post->post_title</a></li>";
 		}
-		$group_string = ucfirst($group);
-	if ( $return == '' ) { return; }
-	return "<div class='cp_$group'><h2>$group_string pages:</h2> <ul>".$return."</ul></div>";
+		$group_string = ucfirst( $group );
+		if ( $return == '' ) { return; }
+		return "<div class='cp_$group'><h2>$group_string pages:</h2> <ul>".$return."</ul></div>";
 	}
 }
 
 //Shortcodes:  [empty], [partial], and [incomplete]
 function content_progress($atts) {
 	extract(shortcode_atts(array(
-				'post_type' => 'page',
+				'type' => 'page',
 				'status' => ''
 			), $atts));
 	
-	return (!$status)?'Status not specified':cp_list_empty_pages($post_type, $status);
+	return (!$status)?'Status not specified':cp_list_empty_pages($type, $status);
 }
 add_shortcode('list','content_progress');
 
 function list_empty($atts) {
 	extract(shortcode_atts(array(
-				'post_type' => 'page',
+				'type' => 'page',
 				'group' => 'empty'
 			), $atts));
-	return cp_list_empty_pages($post_type, $group);
+	return cp_list_empty_pages($type, $group);
 }
 add_shortcode('empty','list_empty');
 
 function list_partial($atts) {
 	extract(shortcode_atts(array(
-				'post_type' => 'page',
+				'type' => 'page',
 				'group' => 'partial'
 			), $atts));
-	return cp_list_empty_pages($post_type, $group);
+	return cp_list_empty_pages($type, $group);
 }
 add_shortcode('partial','list_partial');
 
 function list_incomplete($atts) {
 	extract(shortcode_atts(array(
-				'post_type' => 'page',
+				'type' => 'page',
 				'group' => 'incomplete'
 			), $atts));
-	return cp_list_empty_pages($post_type, $group);
+	return cp_list_empty_pages( $type, $group );
 }
 add_shortcode('incomplete','list_incomplete');
 
 function list_review($atts) {
 	extract(shortcode_atts(array(
-				'post_type' => 'page',
+				'type' => 'page',
 				'group' => 'review'
 			), $atts));
-	return cp_list_empty_pages($type, $group);
+	return cp_list_empty_pages( $type, $group );
 }
 add_shortcode('needs_review','list_review');
 
@@ -201,7 +210,7 @@ add_action('quick_edit_custom_box', 'cp_quickedit_show', 10, 2);
 function cp_quickedit_show( $col, $type ) {
 	$settings = get_option( 'cp_settings' );
 	$statuses = get_option( 'cp_statuses' );
-	$fieldset = $label = $field = $close_fieldset = '';
+	$fieldset = $label = $field = $close_fieldset = $name = '';
 	if ( !$settings || in_array( $type, $settings ) ) {
 		if ( $col == 'cp' ) {
 			$label = 'Flag';
@@ -587,7 +596,7 @@ function cp_show_support_box() {
 				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 				</p>
 			</li>
-			<li><p><?php _e('<a href="http://www.joedolson.com/donate.php">Make a donation today!</a> Every donation counts - donate $2, $10, or $100 and help me keep this plug-in running!','content-progress'); ?></p>
+			<li><p><?php _e('<a href="http://www.joedolson.com/donate/">Make a donation today!</a> Every donation counts - donate $2, $10, or $100 and help me keep this plug-in running!','content-progress'); ?></p>
 				<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 					<div>
 					<input type="hidden" name="cmd" value="_s-xclick" />
@@ -626,7 +635,7 @@ add_action( 'admin_menu', 'cp_add_support_page' );
 function cp_plugin_action($links, $file) {
 	if ($file == plugin_basename(dirname(__FILE__).'/content-progress.php')) {
 		$links[] = "<a href='options-general.php?page=content-progress/content-progress.php'>" . __('Get Support', 'content-progress', 'content-progress') . "</a>";
-		$links[] = "<a href='http://www.joedolson.com/donate.php'>" . __('Donate', 'content-progress', 'content-progress') . "</a>";
+		$links[] = "<a href='http://www.joedolson.com/donate/'>" . __('Donate', 'content-progress', 'content-progress') . "</a>";
 	}
 	return $links;
 }

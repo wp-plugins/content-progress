@@ -1,16 +1,16 @@
 === Content Progress ===
 Contributors: joedolson
-Donate link: http://www.joedolson.com/donate.php
-Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview, workflow
-Requires at least: 3.2.1
-Tested up to: 3.9.1
+Donate link: https://www.joedolson.com/donate/
+Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview, workflow, editing
+Requires at least: 3.7.0
+Tested up to: 4.0
 Stable tag: trunk
 
 Manage your work flow: mark WordPress posts and Pages as completed, partial, needing review. Add notes documenting editorial needs.
 
 == Description ==
 
-Content Progress is a plug-in to help manage your content editing work flow. It adds icons to your content listings (Posts, Pages, and custom post types) to indicate the current needs for that post. 
+Content Progress helps you manage your content editing work flow. It adds icons to your content listings (Posts, Pages, and custom post types) to indicate the current needs for that post. 
 
 The plug-in auto-detects empty posts or documents with very small amounts of content; but also allows you to flag documents specifically.
 
@@ -32,6 +32,17 @@ Spanish, French, Dutch, German, Irish
 <a href="http://www.joedolson.com/articles/translator-credits/">Translator Credits</a>
 
 == Changelog ==
+
+= Future = 
+
+* Feature: add filters to All Posts views
+
+= 1.3.7 =
+
+* Bug fix: post type variable incorrectly called/documented in shortcodes
+* Change: posts automatically ID'd as empty or partial have post meta auto updated when displayed in a list, so that they will show in shortcode lists.
+* Cleared one PHP notice.
+* Added filter to customize the post length auto-flagged as Incomplete: <code>cp_incomplete_length</code>
 
 = 1.3.6 =
 
