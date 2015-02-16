@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: https://www.joedolson.com/donate/
 Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview, workflow, editing
 Requires at least: 3.7.0
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag: trunk
 
 Manage your work flow: mark WordPress posts and Pages as completed, partial, needing review. Add notes documenting editorial needs.
@@ -27,7 +27,7 @@ With the addition of custom statuses available in version 1.3.0, a fifth shortco
 Translating my plug-ins is always appreciated. Visit <a href="http://translate.joedolson.com">my translations site</a> to start getting your language into shape!
 
 Languages available (in order of completeness):
-Spanish, French, Dutch, German, Irish
+German, Dutch, Spanish, French, Polish, Irish
 
 <a href="http://www.joedolson.com/articles/translator-credits/">Translator Credits</a>
 
@@ -36,6 +36,11 @@ Spanish, French, Dutch, German, Irish
 = Future = 
 
 * Feature: add filters to All Posts views
+
+= 1.3.8 =
+
+* Bug fix: Default values did not display after initial refresh. 
+* Add language: Polish.
 
 = 1.3.7 =
 

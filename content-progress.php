@@ -3,11 +3,11 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.3.7
+Version: 1.3.8
 Author: Joseph Dolson
 Author URI: https://www.joedolson.com/
 */
-/*  Copyright 2011-2014  Joseph C Dolson  (email : plugins@joedolson.com)
+/*  Copyright 2011-2015  Joseph C Dolson  (email : plugins@joedolson.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ Author URI: https://www.joedolson.com/
 */
 // Prepend the new column to the columns array
 global $cp_version;
-$cp_version = '1.3.7';
+$cp_version = '1.3.8';
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) . '/lang' ) );
 cp_check_version();
 
@@ -70,22 +70,31 @@ function cp_column($cols) {
 function cp_value($column_name, $id) {
 	if ($column_name == 'cp') {
 		$post = get_post($id);
-		$marked = ( get_post_meta($id,'_cp_incomplete',true) )?get_post_meta($id,'_cp_incomplete',true):'default';
+		$marked = ( get_post_meta( $id,'_cp_incomplete',true ) ) ? get_post_meta( $id,'_cp_incomplete',true ) : 'default';
 		$content = $post->post_content;
 		$statuses = get_option( 'cp_statuses' );
 		$incomplete_length = apply_filters( 'cp_incomplete_length', 60, $id );
-		if ( $content == '' && $marked=='default' ) {
+		if ( $content == '' && $marked == 'default' ) {
 			update_post_meta( $id, '_cp_incomplete', 'empty' );
 			echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked' title='".__('Document is empty','content-progress')."' />";
-		} else if ( strlen($content) < $incomplete_length && $marked=='default' ) {
+		} else if ( strlen( $content ) < $incomplete_length && $marked == 'default' ) {
 			update_post_meta( $id, '_cp_incomplete', 'partial' );		
 			echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' class='$marked' title='".__('Document has less than 60 characters of content.','content-progress')."' />";	
 		} else {
-			foreach ( $statuses as $key => $value ) {
-				$marked = ( $marked == 'true' )?'incomplete':$marked; // old data correction.
-				if ( $marked == $key ) {
-					echo "<img src='$value[icon]' alt='$value[description]' class='$marked cp_status' title='$value[description]' />";
+			if ( in_array( $marked, array_keys( $statuses ) ) ) {
+				foreach ( $statuses as $key => $value ) {
+					$marked = ( $marked == 'true' ) ? 'incomplete' : $marked; // old data correction.
+					if ( $marked == $key ) {
+						echo "<img src='$value[icon]' alt='$value[description]' class='$marked cp_status' title='$value[description]' />";
+					} 
 				}
+			} else {
+				if ( $marked == 'empty' ) {
+					echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked' title='".__('Document is empty','content-progress')."' />";
+				} 
+				if ( $marked == 'partial' ) {
+					echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' class='$marked' title='".__('Document has less than 60 characters of content.','content-progress')."' />";
+				}			
 			}
 		}
 	}
@@ -593,7 +602,7 @@ function cp_show_support_box() {
 		<ul>
 			<li><p>
 				<a href="https://twitter.com/intent/tweet?screen_name=joedolson&text=Content%20Progress" class="twitter-mention-button" data-size="large" data-related="joedolson">Tweet to @joedolson</a>
-				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if (!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 				</p>
 			</li>
 			<li><p><?php _e('<a href="http://www.joedolson.com/donate/">Make a donation today!</a> Every donation counts - donate $2, $10, or $100 and help me keep this plug-in running!','content-progress'); ?></p>
