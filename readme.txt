@@ -6,7 +6,7 @@ Requires at least: 3.7.0
 Tested up to: 4.1
 Stable tag: trunk
 
-Manage your work flow: mark WordPress posts and Pages as completed, partial, needing review. Add notes documenting editorial needs.
+Manage your work flow: mark WordPress posts and Pages as complete or incomplete, or as needing review. Add notes for editorial needs.
 
 == Description ==
 
@@ -36,6 +36,12 @@ German, Dutch, Spanish, French, Polish, Irish
 = Future = 
 
 * Feature: add filters to All Posts views
+
+= 1.3.9 =
+
+* Bug fix: lang textdomain declaration used invalid nesting
+* Bug fix: Posts automatically marked as Empty not automatically cleared when updated.
+* Bug fix: post lists generated with headings labeled 'Pages' rather than actual post types.
 
 = 1.3.8 =
 

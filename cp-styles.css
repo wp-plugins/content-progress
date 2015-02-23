@@ -2,3 +2,11 @@
 #content-progress .meta-box-sortables { min-height: 0; }
 .icon-guide img { vertical-align: bottom; position: relative; top: 5px;}
 .icon-guide li { margin: 0 0 5px; }
+
+#content-progress textarea[readonly="readonly"] {
+    color: #333;
+    border: none;
+    box-shadow: none;
+    font-size: 1.4em;
+	width: 100%;
+}

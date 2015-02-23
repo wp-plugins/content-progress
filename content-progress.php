@@ -3,7 +3,7 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.3.8
+Version: 1.3.9
 Author: Joseph Dolson
 Author URI: https://www.joedolson.com/
 */
@@ -23,23 +23,29 @@ Author URI: https://www.joedolson.com/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-// Prepend the new column to the columns array
+
 global $cp_version;
-$cp_version = '1.3.8';
-load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) . '/lang' ) );
+$cp_version = '1.3.9';
+load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 cp_check_version();
 
 function cp_check_version() {
 	global $cp_version;
-	$prev_version = ( get_option( 'cp_version' ) )?get_option( 'cp_version' ):'1.2.3';
-	if ( version_compare( $prev_version,$cp_version,"<" ) ) {
+	$prev_version = ( get_option( 'cp_version' ) ) ? get_option( 'cp_version' ) : '1.2.3';
+	if ( version_compare( $prev_version, $cp_version, "<" ) ) {
 		cp_activate();
-	} else {
+	} 
+	if ( version_compare( $cp_version, "1.3.9", "<=" ) ) {
+		$statuses = get_option( 'cp_statuses' );
+		if ( !isset( $statuses['empty'] ) ) {
+			$statuses['empty'] = array( 'description'=>'Document is empty', 'icon'=>plugins_url( 'images/empty.png', __FILE__ ), 'label'=>'Empty' );
+			update_option( 'cp_statuses', $statuses );
+		}
 		return;
 	}
 }
 
-if (!function_exists('exif_imagetype') ) {
+if ( !function_exists( 'exif_imagetype' ) ) {
     function exif_imagetype ( $filename ) {
         if ( !is_dir( $filename ) && ( list($width, $height, $type, $attr) = getimagesize( $filename ) ) !== false ) {
             return $type;
@@ -52,9 +58,10 @@ function cp_activate() {
 	global $cp_version;
 	add_option( 'cp_statuses', 
 		array( 
-		'incomplete'=> array( 'description'=>'Manually marked incomplete','icon'=>plugins_url( 'images/incomplete.png', __FILE__ ),'label'=>'Incomplete' ),
-		'complete'=>array(  'description'=>'Manually marked complete', 'icon'=>plugins_url( 'images/complete.png', __FILE__ ),'label'=>'Complete' ),
-		'review'=>array(  'description'=>'Needs editorial review', 'icon'=>plugins_url( 'images/review.png', __FILE__ ),'label'=>'Needs Review' ) 
+			'incomplete'=> array( 'description'=>'Manually marked incomplete','icon'=>plugins_url( 'images/incomplete.png', __FILE__ ),'label'=>'Incomplete' ),
+			'complete'=>   array(  'description'=>'Manually marked complete', 'icon'=>plugins_url( 'images/complete.png', __FILE__ ),'label'=>'Complete' ),
+			'review'=>     array(  'description'=>'Needs editorial review', 'icon'=>plugins_url( 'images/review.png', __FILE__ ),'label'=>'Needs Review' ),
+			'empty'=>      array(  'description'=>'Document is empty', 'icon'=>plugins_url( 'images/empty.png', __FILE__ ),'label'=>'Empty' ) 
 		)
 	);
 	update_option( 'cp_version', $cp_version );
@@ -66,19 +73,36 @@ function cp_column($cols) {
 	return $cols;
 }
 
+function cp_post_empty( $id ) {
+	$post = get_post( $id );
+	$content = $post->post_content;
+	if ( $content == '' ) {
+		return true;
+	}
+	return false;
+}
+
+function cp_post_incomplete( $id ) {
+	$post = get_post( $id );
+	$content = $post->post_content;
+	$incomplete_length = apply_filters( 'cp_incomplete_length', 60, $id );	
+	if (  strlen( $content ) < $incomplete_length ) {
+		return true;
+	}
+	return false;
+}
+
 // Echo the ID for the new column
 function cp_value($column_name, $id) {
 	if ($column_name == 'cp') {
-		$post = get_post($id);
 		$marked = ( get_post_meta( $id,'_cp_incomplete',true ) ) ? get_post_meta( $id,'_cp_incomplete',true ) : 'default';
-		$content = $post->post_content;
+		$marked = esc_attr( $marked );
 		$statuses = get_option( 'cp_statuses' );
-		$incomplete_length = apply_filters( 'cp_incomplete_length', 60, $id );
-		if ( $content == '' && $marked == 'default' ) {
+		if ( cp_post_empty( $id ) && $marked == 'default' ) {
 			update_post_meta( $id, '_cp_incomplete', 'empty' );
 			echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked' title='".__('Document is empty','content-progress')."' />";
-		} else if ( strlen( $content ) < $incomplete_length && $marked == 'default' ) {
-			update_post_meta( $id, '_cp_incomplete', 'partial' );		
+		} else if ( cp_post_incomplete( $id ) && $marked == 'default' ) {
+			update_post_meta( $id, '_cp_incomplete', 'incomplete' );		
 			echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' class='$marked' title='".__('Document has less than 60 characters of content.','content-progress')."' />";	
 		} else {
 			if ( in_array( $marked, array_keys( $statuses ) ) ) {
@@ -100,7 +124,7 @@ function cp_value($column_name, $id) {
 	}
 	if ($column_name == 'cp_notes') {
 		$notes = get_post_meta( $id, '_cp_notes',true );
-		echo "$notes";
+		echo esc_html( stripslashes( $notes ) );
 	}
 }
 
@@ -149,6 +173,7 @@ add_action('admin_init', 'cp_add');
 
 function cp_list_empty_pages( $post_type, $group ) {
 	$return = '';
+	$group = strtolower( trim( $group ) );
 	if ( is_user_logged_in() ) {
 		$args = array( 
 			'post_type'=>$post_type,
@@ -161,9 +186,11 @@ function cp_list_empty_pages( $post_type, $group ) {
 		foreach ( $posts as $post ) {
 			$return .= "<li><a href='".esc_url(get_permalink( $post->ID ))."'>$post->post_title</a></li>";
 		}
+		$post_type = get_post_type_object( $post_type );
+		$label = $post_type->labels->name;
 		$group_string = ucfirst( $group );
 		if ( $return == '' ) { return; }
-		return "<div class='cp_$group'><h2>$group_string pages:</h2> <ul>".$return."</ul></div>";
+		return "<div class='cp_$group'><h2>$group_string $label:</h2> <ul>".$return."</ul></div>";
 	}
 }
 
@@ -174,7 +201,7 @@ function content_progress($atts) {
 				'status' => ''
 			), $atts));
 	
-	return (!$status)?'Status not specified':cp_list_empty_pages($type, $status);
+	return ( !$status ) ? 'Status not specified' : cp_list_empty_pages( $type, $status );
 }
 add_shortcode('list','content_progress');
 
@@ -252,24 +279,26 @@ function cp_quickedit_show( $col, $type ) {
 }
 
 add_action('admin_footer-edit.php', 'cp_admin_edit_foot', 11 );
-
 /* load scripts in the footer */
 function cp_admin_edit_foot() {
     echo '<script type="text/javascript" src="', plugins_url('scripts/admin_edit.js', __FILE__), '"></script>';
 }
 
+add_action( 'save_post', 'cp_post_meta', 10 );
 function cp_post_meta( $id ) {
 	if ( isset( $_POST['_cp_incomplete'] ) ) {
 		$incomplete = $_POST[ '_cp_incomplete' ];
-		update_post_meta( $id, '_cp_incomplete', $incomplete );			
+		if ( ( $incomplete == 'empty' && !cp_post_empty( $id ) ) ) {
+			delete_post_meta( $id, '_cp_incomplete' );
+		} else {
+			update_post_meta( $id, '_cp_incomplete', $incomplete );	
+		}		
 	}
 	if ( isset( $_POST['_cp_notes'] ) ) {
 		$notes = $_POST[ '_cp_notes' ];
 		update_post_meta( $id, '_cp_notes', $notes );
 	}
 }
-
-add_action( 'save_post','cp_post_meta', 10 );
 
 add_action( 'in_plugin_update_message-content-progress/content-progress.php', 'cp_plugin_update_message' );
 function cp_plugin_update_message() {
@@ -294,7 +323,7 @@ function cp_add_outer_box() {
 }
 function cp_add_inner_box() {
 	global $post_id;
-	$cp = get_post_meta($post_id, '_cp_incomplete',true );
+	$cp = get_post_meta( $post_id, '_cp_incomplete', true );
 	$notes = get_post_meta($post_id, '_cp_notes',true );
 	if ( $cp == 'default' || !$cp ) { $dchecked = ' checked="checked"'; } else { $dchecked = ''; }
 	echo "<ul>";
@@ -467,7 +496,7 @@ function cp_settings() {
 
 function cp_setup_statuses() {
 	$statuses = get_option('cp_statuses');
-		$return = "
+	$return = "
 		<h4>".__('Customize Statuses','content-progress')."</h4>
 		<table class='widefat fixed'>
 		<thead><tr><th scope='col'>Status label</th><th scope='col'>Description</th><th scope='col'>Icon URL</th><th scope='col'>Delete Status</th></tr></thead>
@@ -476,7 +505,7 @@ function cp_setup_statuses() {
 		foreach ( $statuses as $key=>$value ) {
 			$return .= "
 		<tr>
-			<td>".stripslashes($value['label'])."</td>
+			<th scope='row'>".stripslashes($value['label'])."</th>
 			<td>$value[description]</td>			
 			<td><img src='$value[icon]' alt='' /></td>			
 			<td><label for='cp_status_delete_$key'>Delete Status</label> <input type='checkbox' id='cp_status_delete_$key' name='cp_status_delete[]' value='$key' /></td>
@@ -485,9 +514,9 @@ function cp_setup_statuses() {
 	}
 	$return .= "
 		<tr>
-			<td><label for='cp_status_label'>Status label</label> <input type='text' id='cp_status_label' name='cp_statuses[label]' value='' /></td>
-			<td><label for='cp_status_desc'>Description </label> <input type='text' id='cp_status_desc' name='cp_statuses[description]' value='' /></td>			
-			<td><label for='cp_status_icon'>Icon URL</label> <input type='text' id='cp_status_icon' name='cp_statuses[icon]' value='' /></td>			
+			<td><label for='cp_status_label'>Status label</label> <input type='text' id='cp_status_label' name='cp_statuses[label]' value='' class='widefat' /></td>
+			<td><label for='cp_status_desc'>Description </label> <input type='text' id='cp_status_desc' name='cp_statuses[description]' value='' class='widefat' /></td>			
+			<td><label for='cp_status_icon'>Icon URL</label> <input type='text' id='cp_status_icon' name='cp_statuses[icon]' value='' class='widefat' /></td>			
 			<td></td>
 		</tr>
 		</tbody></table>";
@@ -537,53 +566,75 @@ function cp_build_statuses() {
 function cp_support_page() {
 ?>
 <div class="wrap" id="content-progress">
-<h2><?php _e('Content Progress','content-progress'); ?></h2>
-<div id="wpt_settings_page" class="postbox-container" style="width: 70%">
-<div class='metabox-holder'>
+	<h2><?php _e('Content Progress','content-progress'); ?></h2>
+	<div id="wpt_settings_page" class="postbox-container" style="width: 70%">
+		<div class='metabox-holder'>
 
-<div class="cp-settings meta-box-sortables">
-<div class="postbox" id="settings">
-<h3><?php _e('Content Progress Settings','content-progress'); ?></h3>
-<div class="inside">
+			<div class="cp-settings meta-box-sortables">
+			<div class="postbox" id="settings">
+				<h3><?php _e('Content Progress Settings','content-progress'); ?></h3>
+				<div class="inside">
 
-<?php cp_settings(); ?>
+				<?php cp_settings(); ?>
 
-<h4><?php _e('Default icon guide:','content-progress'); ?></h4>
-<ul class="icon-guide">
-<?php 
-	echo "<li><img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' /> ".__('Document is empty','content-progress')."</li>
-	<li><img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' /> ".__('Document has less than 60 characters of content.','content-progress')."</li>
-	<li><img src='".plugins_url( 'images/incomplete.png', __FILE__ )."' alt='".__('Manually marked incomplete.','content-progress')."' /> ".__('Manually marked incomplete.','content-progress')."</li>
-	<li><img src='".plugins_url( 'images/complete.png', __FILE__ )."' alt='".__('Manually marked complete.','content-progress')."' /> ".__('Manually marked complete.','content-progress')."</li>
-	<li><img src='".plugins_url( 'images/review.png', __FILE__ )."' alt='".__('Needs Editorial Review.','content-progress')."' /> ".__('Needs Editorial Review.','content-progress')."</li>";
-?>
-</ul>
-<h4><?php _e('Additional included icons','content-progress'); ?></h4>
-<p>
-<?php _e('You can use any URL to reference an icon of your choice; these are included for your convenience.','content-progress'); ?>
-</p>
-<?php 
-$icons = cp_dirlist( dirname(__FILE__).'/images/' ); 
-$defaults = array( 'complete.png','empty.png','incomplete.png','partial.png','review.png' );
-$icons = array_diff( $icons, $defaults );
-echo '<ul class="icon-guide">';
-foreach( $icons as $value ) {
-	echo "<li><img src='".plugins_url( "images/$value", __FILE__ )."' alt='$value' /> <strong>URL:</strong> <code>".plugins_url( "images/$value", __FILE__ ). "</code></li>";
-}
-echo '</ul>';
-?>
-</div>
-</div>
-</div>
-<div class="cp-support meta-box-sortables">
-<div class="postbox" id="get-support">
-<h3><?php _e('Get Plug-in Support','content-progress'); ?></h3>
-<div class="inside">
-<?php cp_get_support_form(); ?>
-</div>
-</div>
-</div>
-</div>
+				<h4><?php _e('Default icon guide:','content-progress'); ?></h4>
+				<ul class="icon-guide">
+				<?php 
+					echo "<li><img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' /> ".__('Document is empty','content-progress')."</li>
+					<li><img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' /> ".__('Document has less than 60 characters of content.','content-progress')."</li>
+					<li><img src='".plugins_url( 'images/incomplete.png', __FILE__ )."' alt='".__('Manually marked incomplete.','content-progress')."' /> ".__('Manually marked incomplete.','content-progress')."</li>
+					<li><img src='".plugins_url( 'images/complete.png', __FILE__ )."' alt='".__('Manually marked complete.','content-progress')."' /> ".__('Manually marked complete.','content-progress')."</li>
+					<li><img src='".plugins_url( 'images/review.png', __FILE__ )."' alt='".__('Needs Editorial Review.','content-progress')."' /> ".__('Needs Editorial Review.','content-progress')."</li>";
+				?>
+				</ul>
+				<h4><?php _e('Additional included icons','content-progress'); ?></h4>
+				<p>
+				<?php _e('You can use any URL to reference an icon of your choice; these are included for your convenience.','content-progress'); ?>
+				</p>
+				<?php 
+				$icons = cp_dirlist( dirname(__FILE__).'/images/' ); 
+				$defaults = array( 'complete.png','empty.png','incomplete.png','partial.png','review.png' );
+				$icons = array_diff( $icons, $defaults );
+				echo '<ul class="icon-guide">';
+				foreach( $icons as $value ) {
+					echo "<li><img src='".plugins_url( "images/$value", __FILE__ )."' alt='$value' /> <strong>URL:</strong> <code>".plugins_url( "images/$value", __FILE__ ). "</code></li>";
+				}
+				echo '</ul>';
+				?>
+				
+				<h4><?php _e( 'Content Progress Shortcodes', 'content-progress' ); ?></h4>
+				<p>
+					<?php _e( 'Type is an optional parameter for all statuses, and will default to "post". The "list" shortcode requires a status type.', 'content-progress' ); ?>
+				</p>
+				
+				<p>
+					<textarea readonly='readonly'>[empty type='post']</textarea>
+				</p>
+				<p>
+					<textarea readonly='readonly'>[partial type='post']</textarea>
+				</p>				
+				<p>
+					<textarea readonly='readonly'>[incomplete type='post']</textarea>
+				</p>
+				<p>				
+					<textarea readonly='readonly'>[needs_review type='post']</textarea>
+				</p>
+				<p>
+					<textarea readonly='readonly'>[list status='' type='post']</textarea>
+				</p>
+				
+				</div>
+			</div>
+		</div>
+		<div class="cp-support meta-box-sortables">
+			<div class="postbox" id="get-support">
+				<h3><?php _e('Get Plug-in Support','content-progress'); ?></h3>
+				<div class="inside">
+				<?php cp_get_support_form(); ?>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <?php cp_show_support_box(); ?>
 </div>
