@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: https://www.joedolson.com/donate/
 Tags: page, post, admin, developer, tools, progress, content, editorial, review, overview, workflow, editing
 Requires at least: 3.7.0
-Tested up to: 4.1
+Tested up to: 4.2
 Stable tag: trunk
 
 Manage your work flow: mark WordPress posts and Pages as complete or incomplete, or as needing review. Add notes for editorial needs.
@@ -36,6 +36,12 @@ German, Dutch, Spanish, French, Polish, Irish
 = Future = 
 
 * Feature: add filters to All Posts views
+
+= 1.3.10 =
+
+* Style change: Wider column for i18n.
+* Bug fix: Selected status did not always display in quick edit.
+* Feature: Set default status for new posts.
 
 = 1.3.9 =
 

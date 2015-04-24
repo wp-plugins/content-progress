@@ -3,7 +3,7 @@
 Plugin Name: Content Progress
 Plugin URI: http://www.joedolson.com/articles/content-progress/
 Description: Adds a column to each post/page or custom post type indicating whether content has been added to the page.
-Version: 1.3.9
+Version: 1.3.10
 Author: Joseph Dolson
 Author URI: https://www.joedolson.com/
 */
@@ -25,7 +25,7 @@ Author URI: https://www.joedolson.com/
 */
 
 global $cp_version;
-$cp_version = '1.3.9';
+$cp_version = '1.3.10';
 load_plugin_textdomain( 'content-progress', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 cp_check_version();
 
@@ -100,7 +100,7 @@ function cp_value($column_name, $id) {
 		$statuses = get_option( 'cp_statuses' );
 		if ( cp_post_empty( $id ) && $marked == 'default' ) {
 			update_post_meta( $id, '_cp_incomplete', 'empty' );
-			echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked' title='".__('Document is empty','content-progress')."' />";
+			echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked'  data-value='$marked' title='".__('Document is empty','content-progress')."' />";
 		} else if ( cp_post_incomplete( $id ) && $marked == 'default' ) {
 			update_post_meta( $id, '_cp_incomplete', 'incomplete' );		
 			echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' class='$marked' title='".__('Document has less than 60 characters of content.','content-progress')."' />";	
@@ -109,15 +109,15 @@ function cp_value($column_name, $id) {
 				foreach ( $statuses as $key => $value ) {
 					$marked = ( $marked == 'true' ) ? 'incomplete' : $marked; // old data correction.
 					if ( $marked == $key ) {
-						echo "<img src='$value[icon]' alt='$value[description]' class='$marked cp_status' title='$value[description]' />";
+						echo "<img src='$value[icon]' alt='$value[description]' class='$marked cp_status' data-value='$marked' title='$value[description]' />";
 					} 
 				}
 			} else {
 				if ( $marked == 'empty' ) {
-					echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked' title='".__('Document is empty','content-progress')."' />";
+					echo "<img src='".plugins_url( 'images/empty.png', __FILE__ )."' alt='".__('Document is empty','content-progress')."' class='$marked' data-value='$marked' title='".__('Document is empty','content-progress')."' />";
 				} 
 				if ( $marked == 'partial' ) {
-					echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' class='$marked' title='".__('Document has less than 60 characters of content.','content-progress')."' />";
+					echo "<img src='".plugins_url( 'images/partial.png', __FILE__ )."' alt='".__('Document has less than 60 characters of content.','content-progress')."' data-value='$marked' class='$marked' title='".__('Document has less than 60 characters of content.','content-progress')."' />";
 				}			
 			}
 		}
@@ -139,8 +139,8 @@ function cp_return_value($value, $column_name, $id) {
 function cp_css() {
 ?>
 <style type="text/css">
-#cp { width: 40px; } 
-#cp_notes { width: 120px; }
+#cp { width: 50px; } 
+#cp_notes { width: 140px; }
 .inline-edit-col-left legend { text-transform:uppercase; font-weight: 700; }
 .text_input { float: left; width: 50%}
 </style>
@@ -317,13 +317,14 @@ function cp_plugin_update_message() {
 function cp_add_outer_box() {
 	if ( function_exists( 'add_meta_box' )) {
 		foreach ( get_post_types() as $value) {
-			add_meta_box( 'cp_div','Content Progress', 'cp_add_inner_box', $value, 'side' );
+			add_meta_box( 'cp_div',__( 'Content Progress', 'content-progress' ), 'cp_add_inner_box', $value, 'side' );
 		}
 	}
 }
 function cp_add_inner_box() {
 	global $post_id;
 	$cp = get_post_meta( $post_id, '_cp_incomplete', true );
+	$cp = ( $cp ) ? $cp : get_option( 'cp_default' );
 	$notes = get_post_meta($post_id, '_cp_notes',true );
 	if ( $cp == 'default' || !$cp ) { $dchecked = ' checked="checked"'; } else { $dchecked = ''; }
 	echo "<ul>";
@@ -467,13 +468,13 @@ function cp_settings() {
 	}
 	cp_build_statuses();
 	$settings = get_option( 'cp_settings' );
-	$post_types = get_post_types( array('public'=>true), 'objects' );
+	$post_types = get_post_types( array( 'public'=>true ), 'objects' );
 	$cp_post_types = $settings;
 	if ( !is_array( $cp_post_types ) ) { $cp_post_types = array(); }
 	$my_post_types = '';
 		foreach( $post_types as $type ) {
 			if ( in_array( $type->name , $cp_post_types ) || empty($cp_post_types) ) { $selected = ' selected="selected"'; } else { $selected = ''; }
-			$my_post_types .= "<option value='$type->name'$selected>$type->name</option>";
+			$my_post_types .= "<option value='$type->name'$selected>$type->label</option>";
 		}
 	echo "
 	<form method='post' action='".admin_url('options-general.php?page=content-progress/content-progress.php')."'>
@@ -495,7 +496,10 @@ function cp_settings() {
 
 
 function cp_setup_statuses() {
-	$statuses = get_option('cp_statuses');
+	$statuses = get_option( 'cp_statuses' );
+	$default = get_option( 'cp_default' );
+	$select = "<p><label for='cp_default'>" . __( 'Default Status', 'content-progress' ) . "</label> <select name='cp_default' id='cp_default'>
+	<option value=''>" . __( 'Default', 'content-progress' ) . "</option>";
 	$return = "
 		<h4>".__('Customize Statuses','content-progress')."</h4>
 		<table class='widefat fixed'>
@@ -510,6 +514,7 @@ function cp_setup_statuses() {
 			<td><img src='$value[icon]' alt='' /></td>			
 			<td><label for='cp_status_delete_$key'>Delete Status</label> <input type='checkbox' id='cp_status_delete_$key' name='cp_status_delete[]' value='$key' /></td>
 		</tr>";
+			$select .= "<option value='" . esc_attr( $key ) . "'" . selected( $key, $default, false ) . ">".stripslashes($value['label'])."</option>";
 		}
 	}
 	$return .= "
@@ -520,7 +525,8 @@ function cp_setup_statuses() {
 			<td></td>
 		</tr>
 		</tbody></table>";
-	return $return;
+	$select .= "</select></p>";
+	return $select . $return;
 }
 
 function cp_dirlist($directory) {
@@ -549,17 +555,22 @@ function cp_dirlist($directory) {
 }
 
 function cp_build_statuses() {
-	$statuses = get_option('cp_statuses');
-		if ( isset($_POST['cp_status_delete']) ) {
-			foreach( $_POST['cp_status_delete'] as $value ) {
-				unset($statuses[$value]);
-			}
-		}	
+	$statuses = get_option( 'cp_statuses' );
+	$default = get_option( 'cp_default' );
+	if ( isset($_POST['cp_status_delete']) ) {
+		foreach( $_POST['cp_status_delete'] as $value ) {
+			unset($statuses[$value]);
+		}
+	}
 	if ( isset($_POST['cp_statuses']) && $_POST['cp_statuses']['label'] != '' ) {
 			$status = $_POST['cp_statuses'];
 			$new_status = array( 'description'=>$status['description'],'icon'=>$status['icon'],'label'=>$status['label'] );
 			$statuses[ sanitize_title($status['label']) ] = $new_status;
 	}
+	if ( isset( $_POST['cp_default'] ) && $_POST['cp_default'] != '' ) {
+		$default = $_POST['cp_default'];
+	}
+	update_option( 'cp_default', $default );
 	update_option( 'cp_statuses', $statuses );
 }
 
@@ -666,12 +677,27 @@ function cp_show_support_box() {
 					</div>
 				</form>
 			</li>
-			<li><a href="http://profiles.wordpress.org/users/joedolson/"><?php _e('Check out my other plug-ins','content-progress'); ?></a></li>
-			<li><a href="http://wordpress.org/extend/plugins/content-progress/"><?php _e('Rate this plug-in','content-progress'); ?></a></li>		
+			<li><a href="http://wordpress.org/extend/plugins/content-progress/"><?php _e('Rate this plug-in','content-progress'); ?></a></li>	
 		</ul>
 		</div>
 		</div>
 	</div>
+	<div class="meta-box-sortables">
+		<div class="postbox">
+		<h3><?php _e('Try my other plugins','content-progress'); ?></h3>
+		<div id="support" class="inside resources">
+		<ul>
+			<li><span class='dashicons dashicons-twitter'></span> <a href="https://wordpress.org/plugins/wp-to-twitter/">WP to Twitter</a></li>
+			<li><span class='dashicons dashicons-calendar-alt'></span> <a href="https://wordpress.org/plugins/my-calendar/">My Calendar</a></li>
+			<li><span class='dashicons dashicons-tickets'></span> <a href="https://wordpress.org/plugins/my-tickets/">My Tickets</a></li>
+			<li><span class='dashicons dashicons-universal-access-alt'></span> <a href="https://wordpress.org/plugins/wp-accessibility/">WP Accessibility</a></li>
+			<li><span class='dashicons dashicons-universal-access'></span> <a href="https://woredpress.org/plugins/access-monitor/">Access Monitor</a></li>
+			<li><span class='dashicons dashicons-wordpress'></span> <a href="http://profiles.wordpress.org/users/joedolson/"><?php _e('And even more...','content-progress'); ?></a></li>
+		</ul>
+		</div>
+		</div>
+	</div>	
+	
 </div>
 </div>
 <?php

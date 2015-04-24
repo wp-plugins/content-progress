@@ -18,7 +18,7 @@ function quickEditCP() {
             // get the existing values
             // the class ".column-cp_notes" is set in columns
             notes = $('.column-cp_notes', postRow).text(),
-            incomplete = $('.column-cp img', postRow).attr('class');
+            incomplete = $('.column-cp img', postRow).attr('data-value');
 
             // set the values in the quick-editor
             $(':input[name="_cp_notes"]', editRow).val(notes);
